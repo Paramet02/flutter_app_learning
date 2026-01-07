@@ -177,65 +177,75 @@ class Homeview extends GetView<FoodController> {
           ),
         ],
       ),
-      // ใช้ ClipRRect เพื่อให้ InkWell ที่อยู่ข้างในไม่ล้นขอบโค้งของ Container
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
-          onTap: () {
-            print("Card Tapped!");
-            // ใส่ logic เมื่อกดที่นี่ เช่น Get.to(DetailPage());
-          },
-          // splashColor: Colors.red.withOpacity(0.1), // เปลี่ยนสีตอนกดได้ที่นี่
+          // [1] ใช้ onTap จาก parameter
+          onTap: onTap ?? () => print("$title Tapped!"), 
           child: Column(
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
-                child: Image.asset(
-                  'assets/images/Cheeseburger.png',
+                child: Image.network(
+                  // [2] ใช้ imageUrl ถ้าไม่มีให้ใช้รูป Default
+                  imageUrl ?? '', 
                   height: 120,
-                  width: 120, // ขยายให้เต็มความกว้าง Card
+                  width: 120,
                   fit: BoxFit.cover,
+                  // ป้องกัน Error กรณีหารูปไม่เจอ
+                  errorBuilder: (context, error, stackTrace) => 
+                      const Icon(Icons.fastfood, size: 50),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(
-                  10.0,
-                ), // เพิ่ม Padding ให้เนื้อหาดูไม่ติดขอบ
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Cheeseburger',
-                      style: TextStyle(
+                    Text(
+                      // [3] ใช้ title จาก parameter
+                      title, 
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const Text(
-                      'Wendy\'s Burger',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    Text(
+                      // [4] ใช้ description จาก parameter
+                      description ?? '', 
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
-                          children: const [
-                            Icon(Icons.star, color: Colors.amber, size: 16),
-                            SizedBox(width: 5),
+                          children: [
+                            const Icon(Icons.star, color: Colors.amber, size: 16),
+                            const SizedBox(width: 5),
                             Text(
-                              '4.5',
-                              style: TextStyle(
+                              // [5] ใช้ rating จาก parameter
+                              rating ?? '0.0', 
+                              style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black,
                               ),
                             ),
                           ],
                         ),
-                        const Icon(Icons.favorite, color: Colors.red, size: 16),
+                        // [6] เปลี่ยนสีหัวใจตามสถานะ isFavorite
+                        Icon(
+                          isFavorite == true ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite == true ? Colors.red : Colors.grey,
+                          size: 16,
+                        ),
                       ],
                     ),
                   ],
