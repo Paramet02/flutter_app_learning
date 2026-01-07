@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_version_2/models/home/controller/food.controller.dart';
+import 'package:get/state_manager.dart';
 
 int _selectedIndex = 0;
 
-class Homeview extends StatefulWidget {
-  const Homeview({super.key});
-
-  @override
-  State<Homeview> createState() => _HomeviewState();
-}
-
-class _HomeviewState extends State<Homeview> {
+class _HomeviewState extends GetView<FoodController>{
   @override
   Widget build(BuildContext context) {
     return Scaffold( // คือ Creates a visual scaffold for Material Design widgets.
