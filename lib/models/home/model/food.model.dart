@@ -1,4 +1,4 @@
-class foodmodel {
+class FoodModel {
   int? id;
   String? name;
   String? category;
@@ -9,7 +9,7 @@ class foodmodel {
   int? price;
   int? calories;
 
-  foodmodel(
+  FoodModel(
       {this.id,
       this.name,
       this.category,
@@ -20,7 +20,7 @@ class foodmodel {
       this.price,
       this.calories});
 
-  foodmodel.fromJson(Map<String, dynamic> json) {
+  FoodModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     category = json['category'];
@@ -34,15 +34,15 @@ class foodmodel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['category'] = this.category;
-    data['image'] = this.image;
-    data['rating'] = this.rating;
-    data['isFavorite'] = this.isFavorite;
-    data['description'] = this.description;
-    data['price'] = this.price;
-    data['calories'] = this.calories;
+    data['id'] = id;
+    data['name'] = name;
+    data['category'] = category;
+    data['image'] = image;
+    data['rating'] = rating;
+    data['isFavorite'] = isFavorite;
+    data['description'] = description;
+    data['price'] = price;
+    data['calories'] = calories;
     return data;
   }
 }

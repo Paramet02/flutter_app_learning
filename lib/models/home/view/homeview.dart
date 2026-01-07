@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_version_2/models/home/controller/food.controller.dart';
 import 'package:get/state_manager.dart';
 
-int _selectedIndex = 0;
 
 class Homeview extends GetView<FoodController> {
   const Homeview({super.key});
@@ -108,54 +107,53 @@ class Homeview extends GetView<FoodController> {
     );
   }
 
-  // --- ส่วนของ Categories ---
   Widget _categories() {
     List<String> labels = ["All", "Combos", "Sliders", "Classic"];
-    
-    // หุ้มด้วย Obx เพื่อให้เวลาเปลี่ยนค่า _selectedIndex แล้ว UI สีปุ่มเปลี่ยนทันที
-    // *หมายเหตุ: _selectedIndex ควรเป็น RxInt ใน Controller เพื่อประสิทธิภาพสูงสุด
     return SizedBox(
       height: 50,
-      child: Obx(() => ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: labels.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              // สมมติว่าใน controller มีตัวแปร selectedCategory.value = index;
-              _selectedIndex = index; 
-              // ถ้าต้องการให้ Obx ทำงาน ตัวแปรที่เปลี่ยนต้องเป็น Rx เช่น controller.selectedIndex.value = index;
-            },
-            child: Container(
-              margin: EdgeInsets.only(right: 15),
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: _selectedIndex == index
-                    ? Colors.red
-                    : const Color.fromARGB(255, 244, 243, 243),
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(255, 220, 219, 219),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  labels[index],
-                  style: TextStyle(
-                    color: _selectedIndex == index
-                        ? Colors.white
-                        : Colors.black54,
-                    fontWeight: FontWeight.bold,
+      // ใช้ Obx ครอบเพื่อให้สีปุ่มเปลี่ยนทันทีเมื่อมีการคลิกเลือก
+      child: Obx(
+        () => ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: controller.foodList.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                // อัปเดตค่าไปยัง Controller (ต้องประกาศ selectedIndex เป็น .obs ใน Controller)
+                controller.selectedIndex.value = index;
+              },
+              child: Container(
+                margin: EdgeInsets.only(right: 15),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  // เรียกใช้ค่าจาก controller ผ่าน .value
+                  color: controller.selectedIndex.value == index
+                      ? Colors.red
+                      : const Color.fromARGB(255, 244, 243, 243),
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromARGB(255, 220, 219, 219),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    labels[index],
+                    style: TextStyle(
+                      color: controller.selectedIndex.value == index
+                          ? Colors.white
+                          : Colors.black54,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
-      )),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -250,29 +248,31 @@ class Homeview extends GetView<FoodController> {
     );
   }
 
-  // --- ส่วนของ GridView ---
   Widget _gridviewbuilder() {
-    // หุ้ม Obx ที่นี่ เพื่อให้เมื่อข้อมูลใน foodList (ที่เป็น RxList) เปลี่ยนแปลง
-    // เช่น การค้นหา หรือโหลดข้อมูลเพิ่ม GridView จะวาดใหม่ทันที
-    return Obx(() => GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 0.75,
+    // ใช้ Obx ครอบเพื่อให้ GridView อัปเดตเมื่อข้อมูลอาหารใน List เปลี่ยนแปลง
+    return Obx(
+      () => GridView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.75,
+        ),
+        itemCount: controller.foodList.length,
+        itemBuilder: (context, index) {
+          // ดึงข้อมูลจาก foodList ใน controller มาแสดงผล
+          final food = controller.foodList[index];
+          return _carditem(
+            title: food.name ?? '',
+            description: food.description,
+            imageUrl: food.image ?? '',
+            rating: food.rating.toString(),
+            isFavorite: food.isFavorite,
+          );
+        },
       ),
-      itemCount: controller.foodList.length,
-      itemBuilder: (context, index) {
-        return _carditem(
-          title: controller.foodList[index].name ?? '',
-          description: controller.foodList[index].description,
-          imageUrl: controller.foodList[index].image ?? '',
-          rating: controller.foodList[index].rating.toString(),
-          isFavorite: controller.foodList[index].isFavorite,
-        );
-      },
-    ));
+    );
   }
 }
